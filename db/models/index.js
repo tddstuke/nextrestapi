@@ -2,12 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const process = require("process");
+const modelPath = process.cwd() + "/db/models/"; //add this line
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.js")[env];
 const db = {};
-
-const Activity = require("./Activity"); //define your model here
 
 let sequelize;
 if (config.use_env_variable) {
@@ -21,16 +20,20 @@ if (config.use_env_variable) {
   );
 }
 
-fs.readdirSync(__dirname)
+console.log(modelPath);
+
+fs.readdirSync(modelPath)
   .filter((file) => {
     return (
       file.indexOf(".") !== 0 &&
       file !== basename &&
       file.slice(-3) === ".js" &&
-      file.indexOf(".test.js") === -1
+      file.indexOf(".test.js") === -1 &&
+      file !== "index.js"
     );
   })
   .forEach((file) => {
+    console.log(file);
     const model = require(__dirname + "../../../db/models/" + file)(
       sequelize,
       Sequelize.DataTypes
@@ -50,6 +53,5 @@ Object.keys(db).forEach((modelName) => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-db.Activity = Activity(sequelize, Sequelize); // add this line, without this, not gonna work in next step
 
 module.exports = db;
